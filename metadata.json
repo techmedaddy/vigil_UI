@@ -1,0 +1,5 @@
+{
+  "name": "Vigil Monitoring System",
+  "description": "A professional, production-ready dashboard for monitoring self-healing infrastructure, managing policies, and tracking remediation actions.",
+  "requestFramePermissions": []
+}
