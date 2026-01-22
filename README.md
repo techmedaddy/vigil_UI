@@ -502,45 +502,7 @@ app.add_middleware(
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/your-feature`
-3. **Commit** changes: `git commit -am 'Add new feature'`
-4. **Push** to branch: `git push origin feature/your-feature`
-5. **Submit** a pull request
-
-### Code Standards
-
-- Follow existing code style
-- Add TypeScript types for all functions
-- Write descriptive commit messages
-- Update documentation for API changes
-- Test changes locally before submitting
 
 ---
 
-## 📄 License
 
-This project is proprietary software. All rights reserved.
-
----
-
-## 📞 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Contact the development team
-- Check documentation in `/docs`
-
----
-
-<div align="center">
-
-**Built with ❤️ using React, TypeScript, and Vite**
-
-*Monitoring made simple. Infrastructure that heals itself.*
-
-</div>
