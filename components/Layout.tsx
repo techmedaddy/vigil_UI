@@ -55,12 +55,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activePage, onPageChan
     <div className="flex h-screen overflow-hidden bg-[#0b0f1a]">
       {/* Sidebar */}
       <aside className="w-64 bg-[#111827] border-r border-gray-800 flex flex-col shrink-0">
-        <div className="p-6 flex items-center space-x-3">
+        <button
+          onClick={() => onPageChange(Page.DASHBOARD)}
+          className="p-6 flex items-center space-x-3 cursor-pointer hover:bg-gray-800/50 transition-colors rounded-lg mx-2 mt-2"
+        >
           <div className="bg-blue-600 p-2 rounded-lg text-white">
             <ShieldCheck size={24} />
           </div>
           <h1 className="text-xl font-bold tracking-tight text-white">Vigil</h1>
-        </div>
+        </button>
 
         <nav className="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
           {navItems.map((item) => (

@@ -107,6 +107,14 @@ class ApiService {
     });
   }
 
+  // Policy Tester - inject test metric for a specific policy
+  async injectTestMetric(policyId: string): Promise<{ ok: boolean; message: string }> {
+    return this.request<{ ok: boolean; message: string }>('/api/v1/policy-tester/inject', {
+      method: 'POST',
+      body: JSON.stringify({ policy_id: policyId }),
+    });
+  }
+
   // Queue - uses /api/v1/queue/status endpoint
   async getQueueStats(): Promise<QueueStats> {
     try {

@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { api } from '../services/api';
-import { EvaluationResult } from '../types';
-import { FlaskConical, Play, CheckCircle, AlertCircle, Info, ArrowRight } from 'lucide-react';
+import { EvaluationResult, Policy } from '../types';
+import { FlaskConical, Play, CheckCircle, AlertCircle, Info, ArrowRight, Zap, Loader2 } from 'lucide-react';
+import { SEVERITY_COLORS } from '../constants';
 
 export const PolicyTester: React.FC = () => {
   const [metricsJson, setMetricsJson] = React.useState(
@@ -12,6 +13,49 @@ export const PolicyTester: React.FC = () => {
   const [result, setResult] = React.useState<EvaluationResult | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  
+  // Policy list state
+  const [policies, setPolicies] = React.useState<Policy[]>([]);
+  const [policiesLoading, setPoliciesLoading] = React.useState(true);
+  const [injectingPolicy, setInjectingPolicy] = React.useState<string | null>(null);
+  const [injectMessage, setInjectMessage] = React.useState<{ policyId: string; message: string } | null>(null);
+
+  // Fetch policies on mount
+  React.useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const data = await api.getPolicies();
+        setPolicies(Object.values(data.policies));
+      } catch (e) {
+        console.error('Failed to fetch policies:', e);
+      } finally {
+        setPoliciesLoading(false);
+      }
+    };
+    fetchPolicies();
+  }, []);
+
+  // Handle test metric injection
+  const handleInjectTest = async (policyId: string) => {
+    setInjectingPolicy(policyId);
+    setInjectMessage(null);
+    try {
+      const response = await api.injectTestMetric(policyId);
+      setInjectMessage({ 
+        policyId, 
+        message: response.message || `Test metric injected for Policy ${policyId}.` 
+      });
+      // Auto-clear message after 5 seconds
+      setTimeout(() => setInjectMessage(null), 5000);
+    } catch (e: any) {
+      setInjectMessage({ 
+        policyId, 
+        message: `Failed to inject test metric: ${e.message}` 
+      });
+    } finally {
+      setInjectingPolicy(null);
+    }
+  };
 
   const handleEvaluate = async () => {
     setLoading(true);
@@ -133,6 +177,83 @@ export const PolicyTester: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Policy List with Test Buttons */}
+      <div className="bg-[#1f2937] p-8 rounded-2xl border border-gray-800">
+        <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+          <Zap size={24} className="mr-3 text-amber-500" />
+          Quick Test - Inject Matching Metrics
+        </h3>
+        <p className="text-gray-400 text-sm mb-6">
+          Click "Test This Policy" to auto-inject a metric that matches the policy's condition. 
+          Triggered actions will appear in Actions History, and the Queue Monitor will reflect the update.
+        </p>
+
+        {/* Confirmation Message */}
+        {injectMessage && (
+          <div className={`mb-6 p-4 rounded-xl flex items-center space-x-3 ${
+            injectMessage.message.includes('Failed') 
+              ? 'bg-red-500/10 border border-red-500/20 text-red-400' 
+              : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+          }`}>
+            {injectMessage.message.includes('Failed') ? (
+              <AlertCircle size={20} className="shrink-0" />
+            ) : (
+              <CheckCircle size={20} className="shrink-0" />
+            )}
+            <span className="text-sm font-medium">{injectMessage.message}</span>
+          </div>
+        )}
+
+        {policiesLoading ? (
+          <div className="flex items-center justify-center py-12 text-gray-500">
+            <Loader2 size={24} className="animate-spin mr-3" />
+            <span>Loading policies...</span>
+          </div>
+        ) : policies.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+            <Info size={48} className="mb-4" />
+            <p>No policies available. Create a policy first.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {policies.map(policy => (
+              <div 
+                key={policy.name} 
+                className="bg-[#111827] border border-gray-700 rounded-xl p-4 flex items-center justify-between hover:border-gray-600 transition-colors"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-3 mb-1">
+                    <span className="font-bold text-white truncate">{policy.name}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black border uppercase tracking-widest ${SEVERITY_COLORS[policy.severity]}`}>
+                      {policy.severity}
+                    </span>
+                    {!policy.enabled && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700 text-gray-400 uppercase">
+                        Disabled
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 truncate">{policy.description}</p>
+                </div>
+                <button
+                  onClick={() => handleInjectTest(policy.name)}
+                  disabled={injectingPolicy === policy.name}
+                  className="ml-4 flex items-center space-x-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg transition-all cursor-pointer hover:shadow-lg hover:shadow-amber-500/20"
+                  title={`Inject a test metric that triggers this policy`}
+                >
+                  {injectingPolicy === policy.name ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Zap size={16} />
+                  )}
+                  <span>Test This Policy</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

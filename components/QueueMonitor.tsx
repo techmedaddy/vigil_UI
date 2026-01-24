@@ -84,7 +84,10 @@ export const QueueMonitor: React.FC = () => {
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-[#1f2937] p-6 rounded-xl border border-gray-800">
+        <div 
+          className="bg-[#1f2937] p-6 rounded-xl border border-gray-800 cursor-pointer hover:bg-[#283548] hover:border-gray-700 transition-all duration-200"
+          title="Number of tasks currently waiting in the queue"
+        >
           <div className="flex items-center space-x-3 text-gray-400 mb-3">
             <Layers size={20} />
             <span className="text-xs font-bold uppercase tracking-wider">Queue Depth</span>
@@ -97,7 +100,10 @@ export const QueueMonitor: React.FC = () => {
           <div className="text-xs text-gray-500">Current waiting tasks</div>
         </div>
 
-        <div className="bg-[#1f2937] p-6 rounded-xl border border-gray-800">
+        <div 
+          className="bg-[#1f2937] p-6 rounded-xl border border-gray-800 cursor-pointer hover:bg-[#283548] hover:border-gray-700 transition-all duration-200"
+          title="Total successful tasks processed"
+        >
           <div className="flex items-center space-x-3 text-gray-400 mb-3">
             <CheckCircle size={20} className="text-emerald-500" />
             <span className="text-xs font-bold uppercase tracking-wider">Completed</span>
@@ -108,7 +114,10 @@ export const QueueMonitor: React.FC = () => {
           <div className="text-xs text-gray-500">Total successful tasks</div>
         </div>
 
-        <div className="bg-[#1f2937] p-6 rounded-xl border border-gray-800">
+        <div 
+          className="bg-[#1f2937] p-6 rounded-xl border border-gray-800 cursor-pointer hover:bg-[#283548] hover:border-gray-700 transition-all duration-200"
+          title="Total tasks that encountered errors"
+        >
           <div className="flex items-center space-x-3 text-gray-400 mb-3">
             <AlertCircle size={20} className="text-red-500" />
             <span className="text-xs font-bold uppercase tracking-wider">Failed</span>
@@ -121,7 +130,10 @@ export const QueueMonitor: React.FC = () => {
           <div className="text-xs text-gray-500">Task execution errors</div>
         </div>
 
-        <div className="bg-[#1f2937] p-6 rounded-xl border border-gray-800">
+        <div 
+          className="bg-[#1f2937] p-6 rounded-xl border border-gray-800 cursor-pointer hover:bg-[#283548] hover:border-gray-700 transition-all duration-200"
+          title="Percentage of successful tasks out of all dequeued tasks"
+        >
           <div className="flex items-center space-x-3 text-gray-400 mb-3">
             <TrendingUp size={20} className="text-blue-500" />
             <span className="text-xs font-bold uppercase tracking-wider">Success Rate</span>
@@ -171,8 +183,11 @@ export const QueueMonitor: React.FC = () => {
                   tickMargin={10}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '8px' }}
-                  labelStyle={{ color: '#9ca3af' }}
+                  contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '8px', padding: '12px' }}
+                  labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
+                  formatter={(value: number, name: string) => [`Depth: ${value}`, '']}
+                  labelFormatter={(label: string) => `at ${label}`}
+                  cursor={{ stroke: '#3b82f6', strokeWidth: 1, strokeDasharray: '4 4' }}
                 />
                 <Area 
                   type="monotone" 
