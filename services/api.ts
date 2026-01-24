@@ -107,20 +107,19 @@ class ApiService {
     });
   }
 
-  // Queue (currently UI router - graceful fallback to mock data if not implemented)
+  // Queue - uses /api/v1/queue/status endpoint
   async getQueueStats(): Promise<QueueStats> {
     try {
-      return await this.request<QueueStats>('/api/v1/ui/queue/stats');
+      return await this.request<QueueStats>('/api/v1/queue/status');
     } catch (error) {
-      // Endpoint not implemented yet, return mock data
-      console.warn('Queue stats endpoint not implemented, using mock data');
+      // Endpoint not available, return fallback data
+      console.warn('Queue status endpoint error, using fallback data');
       return {
-        queue_length: 0,
-        tasks_enqueued: 0,
-        tasks_dequeued: 0,
-        tasks_failed: 0,
-        tasks_completed: 0,
-        queue_name: 'remediation_queue'
+        queue_depth: 0,
+        completed: 0,
+        failed: 0,
+        success_rate: 0,
+        history: []
       };
     }
   }

@@ -33,18 +33,24 @@ export interface Policy {
 }
 
 export interface QueueStats {
-  queue_length: number;
-  tasks_enqueued: number;
-  tasks_dequeued: number;
-  tasks_failed: number;
-  tasks_completed: number;
+  queue_depth: number;
+  completed: number;
+  failed: number;
+  success_rate: number;
+  history: Array<{ time: string; depth: number }>;
+  // Legacy fields for backward compatibility
+  queue_length?: number;
+  tasks_enqueued?: number;
+  tasks_dequeued?: number;
+  tasks_failed?: number;
+  tasks_completed?: number;
   last_processed_task?: {
     task_id: string;
     action_id: number | string;
     target: string;
     timestamp: string;
   };
-  queue_name: string;
+  queue_name?: string;
 }
 
 export interface SimulatorStatus {
