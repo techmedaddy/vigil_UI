@@ -3,8 +3,15 @@ import React from 'react';
 import { api } from '../services/api';
 import { Action } from '../types';
 import { STATUS_COLORS } from '../constants';
-import { Search, RefreshCw, Filter, ChevronRight, Clock, MapPin, Activity, History } from 'lucide-react';
+import { Search, RefreshCw, Filter, ChevronRight, Clock, MapPin, Activity, History, Zap, CheckCircle, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { TriggerActionModal } from './TriggerActionModal';
+
+interface Toast {
+  id: number;
+  type: 'success' | 'error';
+  message: string;
+}
 
 export const Actions: React.FC = () => {
   const [actions, setActions] = React.useState<Action[]>([]);
@@ -12,6 +19,8 @@ export const Actions: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [loading, setLoading] = React.useState(true);
   const [selectedAction, setSelectedAction] = React.useState<Action | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [toasts, setToasts] = React.useState<Toast[]>([]);
 
   const fetchActions = React.useCallback(async () => {
     setLoading(true);
@@ -31,6 +40,19 @@ export const Actions: React.FC = () => {
     fetchActions();
   }, [fetchActions]);
 
+  const showToast = (type: 'success' | 'error', message: string) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
+  const handleActionSuccess = () => {
+    showToast('success', 'Action triggered successfully');
+    fetchActions();
+  };
+
   const filteredActions = actions.filter(a => 
     a.target.toLowerCase().includes(search.toLowerCase()) ||
     a.action.toLowerCase().includes(search.toLowerCase())
@@ -38,6 +60,23 @@ export const Actions: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-in slide-in-from-right duration-300 ${
+              toast.type === 'success' 
+                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}
+          >
+            {toast.type === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+            <span className="text-sm font-medium">{toast.message}</span>
+          </div>
+        ))}
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-white">Actions History</h2>
         
@@ -57,6 +96,13 @@ export const Actions: React.FC = () => {
             className="p-2 bg-[#1f2937] border border-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"
           >
             <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+          </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <Zap size={18} />
+            Trigger Action
           </button>
         </div>
       </div>
@@ -185,6 +231,13 @@ export const Actions: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Trigger Action Modal */}
+      <TriggerActionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleActionSuccess}
+      />
     </div>
   );
 };
