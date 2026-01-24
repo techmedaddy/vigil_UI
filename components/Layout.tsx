@@ -15,6 +15,7 @@ import {
 import { Page } from '../constants';
 import { api } from '../services/api';
 import { SystemHealth } from '../types';
+import { SettingsModal } from './SettingsModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children, activePage, onPageChange }) => {
   const [health, setHealth] = React.useState<SystemHealth | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
 
   React.useEffect(() => {
     const fetchHealth = async () => {
@@ -100,7 +102,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, activePage, onPageChan
               </span>
             </div>
             
-            <button className="text-gray-400 hover:text-white transition-colors">
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
               <Settings size={20} />
             </button>
           </div>
@@ -110,6 +115,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activePage, onPageChan
           {children}
         </main>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
     </div>
   );
 };

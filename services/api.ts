@@ -6,7 +6,8 @@ import {
   QueueStats, 
   SimulatorStatus, 
   IngestResponse, 
-  EvaluationResult 
+  EvaluationResult,
+  Settings 
 } from '../types';
 
 const BASE_URL = 'http://localhost:8000';
@@ -173,6 +174,36 @@ class ApiService {
         last_event_at: new Date().toISOString(),
         uptime_seconds: 0
       };
+    }
+  }
+
+  // Settings
+  async getSettings(): Promise<Settings> {
+    try {
+      return await this.request<Settings>('/api/v1/settings');
+    } catch (error) {
+      console.warn('Settings endpoint not implemented, using default values');
+      return {
+        api_host: 'localhost',
+        api_port: 8000,
+        polling_interval: 5000,
+        log_level: 'info',
+        max_concurrent_tasks: 10,
+        task_queue_size: 100
+      };
+    }
+  }
+
+  async updateSettings(settings: Partial<Settings>): Promise<Settings> {
+    try {
+      return await this.request<Settings>('/api/v1/settings', {
+        method: 'PUT',
+        body: JSON.stringify(settings),
+      });
+    } catch (error) {
+      console.warn('Settings update endpoint not implemented, returning submitted values');
+      const currentSettings = await this.getSettings();
+      return { ...currentSettings, ...settings };
     }
   }
 }

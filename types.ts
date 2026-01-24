@@ -91,3 +91,12 @@ export interface EvaluationResult {
   }>;
   timestamp: string;
 }
+
+export interface Settings {
+  api_host: string;
+  api_port: number;
+  polling_interval: number;
+  log_level: 'debug' | 'info' | 'warning' | 'error';
+  max_concurrent_tasks: number;
+  task_queue_size: number;
+}
